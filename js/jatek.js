@@ -74,6 +74,7 @@ function Generalas() {
         //console.log(data);
         kerdesEl.innerHTML = data["kerdes"].kerdes;
 
+        //Létrehozzuk a válaszoknak a gombokat
         for (let i = 0; i < data["valasz"].length; i++) {
           let button = document.createElement("button");
 
@@ -106,22 +107,30 @@ function ValaszEllenorzes(valaszId, index) {
     .then((response) => response.text())
     .then((request) => {
       if (request == "OK") {
+        //Ha a játékos eltalálta a választ
         gombok[index].style.backgroundColor = "green";
+        gombok[index].style.color = "white";
 
+        //Gombokról leveszzük az eventListener-eket
         for (let i = 0; i < gombok.length; i++) {
           gombok[i].replaceWith(gombok[i].cloneNode(true));
         }
 
+        //1 másodperc után generálunk a felhasználónak új kérdést.
         setTimeout(() => {
           Generalas();
         }, 1000);
       } else {
+        //Ha a játékos nem találta el a választ
         gombok[index].style.backgroundColor = "red";
+        gombok[index].style.color = "white";
 
+        //Gombokról leveszzük az eventListener-eket
         for (let i = 0; i < gombok.length; i++) {
           gombok[i].replaceWith(gombok[i].cloneNode(true));
         }
 
+        //1 másodperc után kiirjuk, hogy vesztett a felhasználó.
         setTimeout(() => {
           hovaEl.innerHTML = "";
           H1General("Vesztettél! :(", hovaEl);
