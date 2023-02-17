@@ -2,7 +2,8 @@
 $conn = new mysqli("localhost", "root", "", "legyenonismilliomos");
 
 if ($conn->connect_errno) {
-    echo "Nem sikerült csatlakozni a MySQL-hez: " . $conn->connect_error;
-    exit();
+    die("Nem sikerült csatlakozni a MySQL-hez: " . $conn->connect_error);
 }
+
+$conn->set_charset("utf8");
 ?>
