@@ -107,12 +107,21 @@ function ValaszEllenorzes(valaszId, index) {
     .then((request) => {
       if (request == "OK") {
         gombok[index].style.backgroundColor = "green";
+
+        for (let i = 0; i < gombok.length; i++) {
+          gombok[i].replaceWith(gombok[i].cloneNode(true));
+        }
+
         setTimeout(() => {
           Generalas();
         }, 1000);
       } else {
-        console.log("Vesztettél");
         gombok[index].style.backgroundColor = "red";
+
+        for (let i = 0; i < gombok.length; i++) {
+          gombok[i].replaceWith(gombok[i].cloneNode(true));
+        }
+
         setTimeout(() => {
           hovaEl.innerHTML = "";
           H1General("Vesztettél! :(", hovaEl);
