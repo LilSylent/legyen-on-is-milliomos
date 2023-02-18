@@ -15,6 +15,7 @@ if (isset($_POST["f"])) {
 function kerdesLekerese()
 {
     global $conn;
+    session_start();
 
     $stmt = $conn->prepare("SELECT id, kerdes FROM kerdesek WHERE nehezseg = ? ORDER BY RAND() LIMIT 1");
     $stmt->bind_param("i", $_POST["k"]);
@@ -27,6 +28,7 @@ function kerdesLekerese()
     }
 
     valaszokLekerese($tomb["kerdes"]["id"], $tomb);
+    korUpdate($_POST["k"], $_SESSION["login"][1]);
 }
 
 function valaszokLekerese($id, $tomb)
@@ -59,6 +61,15 @@ function valaszEllenorzes()
     if ($sor["helyes"] == 1) {
         echo "OK";
     }
+}
+
+function korUpdate($szint, $nev)
+{
+    global $conn;
+
+    $stmt = $conn->prepare("UPDATE jatekos SET szint = ? WHERE nev LIKE ?");
+    $stmt->bind_param("is", $szint, $nev);
+    $stmt->execute();
 }
 
 $conn->close();
