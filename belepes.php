@@ -30,7 +30,9 @@ if ($stmt->num_rows() < 1) {
     $stmt->execute();
 }
 
-$_SESSION["login"] = true;
+$_SESSION["login"] = array();
+$_SESSION["login"][] = true;
+$_SESSION["login"][] = $_POST["username"];
 echo "OK";
 
 $conn->close();
