@@ -133,7 +133,6 @@ function ValaszEllenorzes(valaszId, index) {
 
         //1 másodperc után kiirjuk, hogy vesztett a felhasználó.
         setTimeout(() => {
-          hovaEl.innerHTML = "";
           H1General("Vesztettél! :(", hovaEl);
           let button = document.createElement("button");
 
@@ -150,6 +149,9 @@ function ValaszEllenorzes(valaszId, index) {
 }
 
 function H1General(mit, hova) {
+  hova.innerHTML = "";
+  document.querySelector("#kerdes").innerHTML = "";
+  document.querySelector("#kor").innerHTML = "";
   let h1 = document.createElement("h1");
   h1.innerHTML = mit;
   hova.appendChild(h1);
