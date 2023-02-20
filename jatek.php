@@ -36,7 +36,7 @@ function valaszokLekerese($id, $tomb)
     global $conn;
     $tomb["valasz"] = array();
 
-    $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ?");
+    $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ? ORDER BY RAND()");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $reader = $stmt->get_result();
