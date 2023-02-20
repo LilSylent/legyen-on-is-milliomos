@@ -79,6 +79,7 @@ function Generalas() {
           let button = document.createElement("button");
 
           button.innerHTML = data["valasz"][i].valasz;
+          button.setAttribute("type", "button");
           button.classList.add("valasz", "gomb");
           button.addEventListener("click", () => {
             ValaszEllenorzes(data["valasz"][i].id, i);
