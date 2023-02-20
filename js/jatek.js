@@ -4,7 +4,7 @@ var JELENLEGI_KOR;
 LoginEllenorzes();
 
 document.addEventListener("DOMContentLoaded", () => {
-  Alapbeallitas();
+  jatszottE();
   document.querySelector("#logout").addEventListener("click", Kilepes);
 });
 
@@ -155,4 +155,24 @@ function H1General(mit, hova) {
   let h1 = document.createElement("h1");
   h1.innerHTML = mit;
   hova.appendChild(h1);
+}
+
+function jatszottE() {
+  let formData = new FormData();
+  formData.append("f", "jatszott");
+
+  fetch("jatek.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((request) => {
+      if (request) {
+        alert("Szeretnéd folytatni a játékot?");
+        JELENLEGI_KOR = request - 1;
+        Generalas();
+      } else {
+        Alapbeallitas();
+      }
+    });
 }

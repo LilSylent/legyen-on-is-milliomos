@@ -3,6 +3,9 @@ include("connect.php");
 
 if (isset($_POST["f"])) {
     switch ($_POST["f"]) {
+        case "jatszott":
+            jatszottE();
+            break;
         case "lekerdezes":
             kerdesLekerese();
             break;
@@ -70,6 +73,23 @@ function korUpdate($szint, $nev)
     $stmt = $conn->prepare("UPDATE jatekos SET szint = ? WHERE nev LIKE ?");
     $stmt->bind_param("is", $szint, $nev);
     $stmt->execute();
+}
+
+function jatszottE()
+{
+    global $conn;
+
+    session_start();
+
+    $stmt = $conn->prepare("SELECT szint FROM jatekos WHERE nev LIKE ?");
+    $stmt->bind_param("s", $_SESSION["login"][1]);
+    $stmt->execute();
+    $reader = $stmt->get_result();
+    $sor = $reader->fetch_assoc();
+
+    if ($sor["szint"] > 1) {
+        echo $sor["szint"];
+    }
 }
 
 $conn->close();
