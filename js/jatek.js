@@ -141,29 +141,28 @@ function ValaszEllenorzes(valaszId, index) {
         //1 másodperc után kiirjuk, hogy vesztett a felhasználó.
         setTimeout(() => {
           H1General("Vesztettél! :(", hovaEl);
-          let button = document.createElement("button");
-
-          button.innerHTML = "Újrakezdés";
-          button.classList.add("gomb");
-          button.addEventListener("click", () => {
-            Alapbeallitas();
-          });
-
-          hovaEl.appendChild(button);
         }, 1000);
       }
     });
 }
 
-function H1General(mit, hova) {
+function H1General(felirat, hova) {
   hova.innerHTML = "";
   document.querySelector("#kerdes").innerHTML = "";
   document.querySelector("#kor").innerHTML = "";
   document.querySelector("#segitsegek").innerHTML = "";
 
   let h1 = document.createElement("h1");
-  h1.innerHTML = mit;
+  h1.innerHTML = felirat;
+
   hova.appendChild(h1);
+
+  let button = document.createElement("button");
+  button.innerHTML = "Újrakezdés";
+  button.classList.add("gomb");
+  button.addEventListener("click", Alapbeallitas);
+
+  hova.appendChild(button);
 }
 
 function jatszottE() {
