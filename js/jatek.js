@@ -47,16 +47,13 @@ function Alapbeallitas() {
   let kerdesEl = document.querySelector("#kerdes");
   kerdesEl.innerHTML = "";
 
-  Generalas();
+  Lekeredezes();
 }
 
-function Generalas() {
+function Lekeredezes() {
   JELENLEGI_KOR++;
   let hovaEl = document.querySelector("#valaszok");
   hovaEl.innerHTML = "";
-
-  let kerdesEl = document.querySelector("#kerdes");
-  kerdesEl.innerHTML = "";
 
   if (JELENLEGI_KOR <= MAX_KOR) {
     document.querySelector("#kor").innerHTML = JELENLEGI_KOR + "/" + MAX_KOR;
@@ -72,24 +69,28 @@ function Generalas() {
       .then((response) => response.json())
       .then((data) => {
         //console.log(data);
-        kerdesEl.innerHTML = data["kerdes"].kerdes;
-
-        //Létrehozzuk a válaszoknak a gombokat
-        for (let i = 0; i < data["valasz"].length; i++) {
-          let button = document.createElement("button");
-
-          button.innerHTML = data["valasz"][i].valasz;
-          button.setAttribute("type", "button");
-          button.classList.add("valasz", "gomb");
-          button.addEventListener("click", () => {
-            ValaszEllenorzes(data["valasz"][i].id, i);
-          });
-
-          hovaEl.appendChild(button);
-        }
+        Generalas(data, hovaEl);
       });
   } else {
     H1General("Győztél! :)", hovaEl);
+  }
+}
+
+function Generalas(data, hova) {
+  document.querySelector("#kerdes").innerHTML = data["kerdes"].kerdes;
+
+  //Létrehozzuk a válaszoknak a gombokat
+  for (let i = 0; i < data["valasz"].length; i++) {
+    let button = document.createElement("button");
+
+    button.innerHTML = data["valasz"][i].valasz;
+    button.setAttribute("type", "button");
+    button.classList.add("valasz", "gomb");
+    button.addEventListener("click", () => {
+      ValaszEllenorzes(data["valasz"][i].id, i);
+    });
+
+    hova.appendChild(button);
   }
 }
 
@@ -119,17 +120,12 @@ function ValaszEllenorzes(valaszId, index) {
 
         //1 másodperc után generálunk a felhasználónak új kérdést.
         setTimeout(() => {
-          Generalas();
+          Lekeredezes();
         }, 1000);
       } else {
         //Ha a játékos nem találta el a választ
         gombok[index].style.backgroundColor = "red";
         gombok[index].style.color = "white";
-
-        //Gombokról leveszzük az eventListener-eket
-        for (let i = 0; i < gombok.length; i++) {
-          gombok[i].replaceWith(gombok[i].cloneNode(true));
-        }
 
         //1 másodperc után kiirjuk, hogy vesztett a felhasználó.
         setTimeout(() => {
@@ -170,7 +166,7 @@ function jatszottE() {
       if (request) {
         alert("Szeretnéd folytatni a játékot?");
         JELENLEGI_KOR = request - 1;
-        Generalas();
+        Lekeredezes();
       } else {
         Alapbeallitas();
       }
