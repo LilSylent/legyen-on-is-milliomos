@@ -6,6 +6,7 @@ LoginEllenorzes();
 document.addEventListener("DOMContentLoaded", () => {
   jatszottE();
   document.querySelector("#logout").addEventListener("click", Kilepes);
+  document.querySelector("#otvenotven").addEventListener("click", OtvenOtven);
 });
 
 function Kilepes() {
@@ -53,7 +54,6 @@ function Alapbeallitas() {
 function Lekeredezes() {
   JELENLEGI_KOR++;
   let hovaEl = document.querySelector("#valaszok");
-  hovaEl.innerHTML = "";
 
   if (JELENLEGI_KOR <= MAX_KOR) {
     document.querySelector("#kor").innerHTML = JELENLEGI_KOR + "/" + MAX_KOR;
@@ -78,6 +78,9 @@ function Lekeredezes() {
 
 function Generalas(data, hova) {
   document.querySelector("#kerdes").innerHTML = data["kerdes"].kerdes;
+  document.querySelector("#kerdes").setAttribute("data-id", data["kerdes"].id);
+
+  hova.innerHTML = "";
 
   //Létrehozzuk a válaszoknak a gombokat
   for (let i = 0; i < data["valasz"].length; i++) {
@@ -174,5 +177,20 @@ function jatszottE() {
       } else {
         Alapbeallitas();
       }
+    });
+}
+
+function OtvenOtven() {
+  let formData = new FormData();
+  formData.append("f", "otven");
+  formData.append("id", document.querySelector("#kerdes").dataset.id);
+
+  fetch("jatek.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      Generalas(data, document.querySelector("#valaszok"));
     });
 }
