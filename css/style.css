@@ -2,6 +2,7 @@ body {
   font-family: sans-serif;
   background-color: #0a0a0a;
   color: #ffffff;
+  margin: 0;
 }
 
 h1 {
@@ -78,10 +79,6 @@ input[type="text"]:focus {
 html,
 body {
   height: 98%;
-}
-
-body {
-  margin: 0;
 }
 
 footer {

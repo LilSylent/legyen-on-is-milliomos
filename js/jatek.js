@@ -127,6 +127,10 @@ function ValaszEllenorzes(valaszId, index) {
         gombok[index].style.backgroundColor = "red";
         gombok[index].style.color = "white";
 
+        for (let i = 0; i < gombok.length; i++) {
+          gombok[i].replaceWith(gombok[i].cloneNode(true));
+        }
+
         //1 másodperc után kiirjuk, hogy vesztett a felhasználó.
         setTimeout(() => {
           H1General("Vesztettél! :(", hovaEl);
