@@ -22,19 +22,27 @@ function kerdesLekerese()
 {
     global $conn;
     session_start();
+    $nev = $_SESSION["login"][1];
 
-    $stmt = $conn->prepare("SELECT id, kerdes FROM kerdesek WHERE nehezseg = ? ORDER BY RAND() LIMIT 1");
-    $stmt->bind_param("i", $_POST["k"]);
-    $stmt->execute();
-    $reader = $stmt->get_result();
-    $tomb = array();
+    if (isset($_POST["k"])) {
+        //Ha az 1. körnél járunk, akkor a játékos kapjon 50/50-et
+        if ($_POST["k"] == 1) {
+            otvenOtvenUpdate($nev, 1);
+        }
 
-    while ($sor = $reader->fetch_assoc()) {
-        $tomb["kerdes"] = $sor;
+        $stmt = $conn->prepare("SELECT id, kerdes FROM kerdesek WHERE nehezseg = ? ORDER BY RAND() LIMIT 1");
+        $stmt->bind_param("i", $_POST["k"]);
+        $stmt->execute();
+        $reader = $stmt->get_result();
+        $tomb = array();
+
+        while ($sor = $reader->fetch_assoc()) {
+            $tomb["kerdes"] = $sor;
+        }
+
+        valaszokLekerese($tomb["kerdes"]["id"], $tomb);
+        korUpdate($_POST["k"], $_SESSION["login"][1]);
     }
-
-    valaszokLekerese($tomb["kerdes"]["id"], $tomb);
-    korUpdate($_POST["k"], $_SESSION["login"][1]);
 }
 
 function valaszokLekerese($id, $tomb)
@@ -69,15 +77,6 @@ function valaszEllenorzes()
     }
 }
 
-function korUpdate($szint, $nev)
-{
-    global $conn;
-
-    $stmt = $conn->prepare("UPDATE jatekos SET szint = ? WHERE nev LIKE ?");
-    $stmt->bind_param("is", $szint, $nev);
-    $stmt->execute();
-}
-
 function jatszottE()
 {
     global $conn;
@@ -99,40 +98,73 @@ function otvenOtven()
 {
     global $conn;
 
+    session_start();
+
     $id = $_POST["id"];
+    $nev = $_SESSION["login"][1];
 
-    $stmt = $conn->prepare("SELECT id, kerdes FROM kerdesek WHERE id = ?");
-    $stmt->bind_param("i", $id);
+    //Lekérdezzük, hogy a játékosnak van-e lehetősége 50/50-re
+    $stmt = $conn->prepare("SELECT felezes FROM jatekos WHERE nev LIKE ?");
+    $stmt->bind_param("s", $nev);
     $stmt->execute();
     $reader = $stmt->get_result();
-    $tomb = array();
+    $sor = $reader->fetch_assoc();
 
-    while ($sor = $reader->fetch_assoc()) {
-        $tomb["kerdes"] = $sor;
+    if (!empty($id) && $sor["felezes"] == 1) {
+        $stmt = $conn->prepare("SELECT id, kerdes FROM kerdesek WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $reader = $stmt->get_result();
+        $tomb = array();
+
+        while ($sor = $reader->fetch_assoc()) {
+            $tomb["kerdes"] = $sor;
+        }
+
+        //Helyes válasz lekérése
+        $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ? AND helyes = 1 ORDER BY RAND()");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $reader = $stmt->get_result();
+
+        $sor = $reader->fetch_assoc();
+        $tomb["valasz"][] = $sor;
+
+        //1 random válasz lekérése, ami nem helyes
+        $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ? AND helyes = 0 ORDER BY RAND() LIMIT 1");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $reader = $stmt->get_result();
+
+        $sor = $reader->fetch_assoc();
+        $tomb["valasz"][] = $sor;
+
+        //Újrarendezzük a tömböt.
+        shuffle($tomb["valasz"]);
+
+        //Áttálítjuk az 50/50-et 0-ra
+        otvenOtvenUpdate($nev, 0);
+
+        echo json_encode($tomb);
     }
+}
 
-    //Helyes válasz lekérése
-    $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ? AND helyes = 1 ORDER BY RAND()");
-    $stmt->bind_param("i", $id);
+function korUpdate($szint, $nev)
+{
+    global $conn;
+
+    $stmt = $conn->prepare("UPDATE jatekos SET szint = ? WHERE nev LIKE ?");
+    $stmt->bind_param("is", $szint, $nev);
     $stmt->execute();
-    $reader = $stmt->get_result();
+}
 
-    $sor = $reader->fetch_assoc();
-    $tomb["valasz"][] = $sor;
+function otvenOtvenUpdate($nev, $van)
+{
+    global $conn;
 
-    //1 random válasz lekérése, ami nem helyes
-    $stmt = $conn->prepare("SELECT valaszok.id, valaszok.valasz FROM valaszok INNER JOIN kerdesek ON (kerdesek.id = valaszok.kid) WHERE valaszok.kid = ? AND helyes = 0 ORDER BY RAND() LIMIT 1");
-    $stmt->bind_param("i", $id);
+    $stmt = $conn->prepare("UPDATE jatekos SET felezes = ? WHERE nev LIKE ?");
+    $stmt->bind_param("is", $van, $nev);
     $stmt->execute();
-    $reader = $stmt->get_result();
-
-    $sor = $reader->fetch_assoc();
-    $tomb["valasz"][] = $sor;
-
-    //Újrarendezzük a tömböt.
-    shuffle($tomb["valasz"]);
-
-    echo json_encode($tomb);
 }
 
 $conn->close();
