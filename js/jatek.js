@@ -47,6 +47,7 @@ function Alapbeallitas() {
   let kerdesEl = document.querySelector("#kerdes");
   kerdesEl.innerHTML = "";
 
+  segitsegGeneralas("50/50", OtvenOtven, "otvenotven");
   Lekeredezes();
 }
 
@@ -79,8 +80,6 @@ function Generalas(data, hova) {
   document.querySelector("#kerdes").innerHTML = data["kerdes"].kerdes;
   document.querySelector("#kerdes").setAttribute("data-id", data["kerdes"].id);
 
-  document.querySelector("#otvenotven").addEventListener("click", OtvenOtven);
-
   hova.innerHTML = "";
 
   //Létrehozzuk a válaszoknak a gombokat
@@ -106,7 +105,7 @@ function ValaszEllenorzes(valaszId, index) {
   let gombok = document.querySelectorAll(".valasz");
   let hovaEl = document.querySelector("#valaszok");
 
-  //A gombról leveszzük az event listener-t
+  //A gombról levesszük az event listener-t
   let otvenotven = document.querySelector("#otvenotven");
   otvenotven.removeEventListener("click", OtvenOtven);
 
@@ -160,6 +159,8 @@ function H1General(mit, hova) {
   hova.innerHTML = "";
   document.querySelector("#kerdes").innerHTML = "";
   document.querySelector("#kor").innerHTML = "";
+  document.querySelector("#segitsegek").innerHTML = "";
+
   let h1 = document.createElement("h1");
   h1.innerHTML = mit;
   hova.appendChild(h1);
@@ -178,6 +179,7 @@ function jatszottE() {
       if (request) {
         alert("Szeretnéd folytatni a játékot?");
         JELENLEGI_KOR = request - 1;
+        segitsegGeneralas("50/50", OtvenOtven, "otvenotven");
         Lekeredezes();
       } else {
         Alapbeallitas();
@@ -198,4 +200,16 @@ function OtvenOtven() {
     .then((data) => {
       Generalas(data, document.querySelector("#valaszok"));
     });
+}
+
+function segitsegGeneralas(felirat, funkcio, id) {
+  let hova = document.querySelector("#segitsegek");
+
+  let button = document.createElement("button");
+  button.innerHTML = felirat;
+  button.setAttribute("type", "button");
+  button.setAttribute("id", id);
+  button.addEventListener("click", funkcio);
+
+  hova.appendChild(button);
 }
