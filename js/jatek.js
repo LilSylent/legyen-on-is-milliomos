@@ -6,7 +6,6 @@ LoginEllenorzes();
 document.addEventListener("DOMContentLoaded", () => {
   jatszottE();
   document.querySelector("#logout").addEventListener("click", Kilepes);
-  document.querySelector("#otvenotven").addEventListener("click", OtvenOtven);
 });
 
 function Kilepes() {
@@ -80,6 +79,8 @@ function Generalas(data, hova) {
   document.querySelector("#kerdes").innerHTML = data["kerdes"].kerdes;
   document.querySelector("#kerdes").setAttribute("data-id", data["kerdes"].id);
 
+  document.querySelector("#otvenotven").addEventListener("click", OtvenOtven);
+
   hova.innerHTML = "";
 
   //Létrehozzuk a válaszoknak a gombokat
@@ -104,6 +105,10 @@ function ValaszEllenorzes(valaszId, index) {
 
   let gombok = document.querySelectorAll(".valasz");
   let hovaEl = document.querySelector("#valaszok");
+
+  //A gombról leveszzük az event listener-t
+  let otvenotven = document.querySelector("#otvenotven");
+  otvenotven.removeEventListener("click", OtvenOtven);
 
   fetch("jatek.php", {
     method: "POST",
