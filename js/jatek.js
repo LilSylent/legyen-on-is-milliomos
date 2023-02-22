@@ -47,13 +47,13 @@ function Alapbeallitas() {
   let kerdesEl = document.querySelector("#kerdes");
   kerdesEl.innerHTML = "";
 
-  segitsegGeneralas("50/50", OtvenOtven, "otvenotven");
   Lekeredezes();
 }
 
 function Lekeredezes() {
   JELENLEGI_KOR++;
   let hovaEl = document.querySelector("#valaszok");
+  document.querySelector("#grafikon-container").innerHTML = "";
 
   if (JELENLEGI_KOR <= MAX_KOR) {
     document.querySelector("#kor").innerHTML = JELENLEGI_KOR + "/" + MAX_KOR;
@@ -81,6 +81,9 @@ function Generalas(data, hova) {
   document.querySelector("#kerdes").setAttribute("data-id", data["kerdes"].id);
 
   hova.innerHTML = "";
+  document.querySelector("#segitsegek").innerHTML = "";
+  segitsegGeneralas("50/50", OtvenOtven, "otvenotven");
+  segitsegGeneralas("Közönség", kozonseg, "kozonseg");
 
   //Létrehozzuk a válaszoknak a gombokat
   for (let i = 0; i < data["valasz"].length; i++) {
@@ -106,8 +109,11 @@ function ValaszEllenorzes(valaszId, index) {
   let hovaEl = document.querySelector("#valaszok");
 
   //A gombról levesszük az event listener-t
-  let otvenotven = document.querySelector("#otvenotven");
-  otvenotven.removeEventListener("click", OtvenOtven);
+  let otvenotvenEl = document.querySelector("#otvenotven");
+  otvenotvenEl.removeEventListener("click", OtvenOtven);
+
+  let kozonsegEl = document.querySelector("#kozonseg");
+  kozonsegEl.removeEventListener("click", kozonseg);
 
   fetch("jatek.php", {
     method: "POST",
@@ -151,6 +157,7 @@ function H1General(felirat, hova) {
   document.querySelector("#kerdes").innerHTML = "";
   document.querySelector("#kor").innerHTML = "";
   document.querySelector("#segitsegek").innerHTML = "";
+  document.querySelector("#grafikon-container").innerHTML = "";
 
   let h1 = document.createElement("h1");
   h1.innerHTML = felirat;
@@ -178,7 +185,6 @@ function jatszottE() {
       if (request) {
         alert("Szeretnéd folytatni a játékot?");
         JELENLEGI_KOR = request - 1;
-        segitsegGeneralas("50/50", OtvenOtven, "otvenotven");
         Lekeredezes();
       } else {
         Alapbeallitas();
@@ -199,6 +205,51 @@ function OtvenOtven() {
     .then((data) => {
       Generalas(data, document.querySelector("#valaszok"));
     });
+}
+
+function kozonseg() {
+  let formData = new FormData();
+  formData.append("f", "kozonseg");
+  formData.append("id", document.querySelector("#kerdes").dataset.id);
+
+  fetch("jatek.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      GrafikonGeneralas(data);
+    });
+}
+
+function GrafikonGeneralas(adat) {
+  let hova = document.querySelector("#grafikon-container");
+  hova.innerHTML = "";
+  let canvas = document.createElement("canvas");
+  canvas.setAttribute("id", "grafikon");
+  hova.appendChild(canvas);
+
+  const ctx = document.querySelector("#grafikon");
+  var grafikon = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: adat["valasz"].map((sor) => sor.valasz),
+      datasets: [
+        {
+          label: "Szavazatok száma (%)",
+          data: adat["valasz"].map((sor) => sor.szazalek),
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 }
 
 function segitsegGeneralas(felirat, funkcio, id) {

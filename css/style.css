@@ -89,3 +89,7 @@ footer {
   align-items: end;
   justify-content: end;
 }
+
+#grafikon-container {
+  height: 40%;
+}
