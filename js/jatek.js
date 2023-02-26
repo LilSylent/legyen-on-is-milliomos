@@ -175,21 +175,42 @@ function H1General(felirat, hova) {
 function jatszottE() {
   let formData = new FormData();
   formData.append("f", "jatszott");
+  let hova = document.querySelector("#valaszok");
+  hova.innerHTML = "";
+  document.querySelector("#kor").innerHTML = "";
 
   fetch("jatek.php", {
     method: "POST",
     body: formData,
   })
     .then((response) => response.text())
-    .then((request) => {
-      if (request) {
-        alert("Szeretnéd folytatni a játékot?");
-        JELENLEGI_KOR = request - 1;
-        Lekeredezes();
+    .then((kor) => {
+      if (kor) {
+        JELENLEGI_KOR = kor - 1;
+        folytatjaE(hova);
       } else {
         Alapbeallitas();
       }
     });
+}
+
+function folytatjaE(hova) {
+  document.querySelector("#kerdes").innerHTML =
+    "Szeretnéd folytatni az előző játékot?";
+
+  let igen = document.createElement("button");
+  igen.innerHTML = "Igen";
+  igen.classList.add("gomb", "zold");
+  igen.setAttribute("type", "button");
+  igen.addEventListener("click", Lekeredezes);
+  hova.appendChild(igen);
+
+  let nem = document.createElement("button");
+  nem.innerHTML = "Nem";
+  nem.classList.add("gomb", "piros");
+  nem.setAttribute("type", "button");
+  nem.addEventListener("click", Alapbeallitas);
+  hova.appendChild(nem);
 }
 
 function OtvenOtven() {
